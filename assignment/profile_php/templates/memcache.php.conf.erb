@@ -1,0 +1,18 @@
+#
+# Config for /memcache.php.
+#
+# THIS FILE IS MANAGED BY PUPPET !!!
+# CHANGES MADE TO THIS FILE WILL BE OVERWRITTEN !!!
+
+Alias /memcache.php <%= @memcache_script_path %>
+RewriteEngine On
+<% @memcache_script_allow_ips.each do |ip| -%>
+RewriteCond "%{REMOTE_ADDR}" "!<%= ip %>"
+RewriteCond "%{HTTP:X-FORWARDED-FOR}" "!^<%= ip %>"
+<% end -%>
+<% if @memcache_script_allow_ips.empty? -%>
+# No IP addresses given in profile_php::server::memcache_script_allow_ips param. By
+# default everything is blocked. Add some ips to this in the yaml file to allow
+# access.
+<% end -%>
+RewriteRule "/memcache\.php" "-" [F]

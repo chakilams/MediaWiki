@@ -1,0 +1,56 @@
+---
+
+# Server Root Password Category
+profile_accounts::client::root_password: 'www_mysql'
+
+# Patching Notifications
+profile_patching::client::email: "'is-webteam@org.com'"
+
+# Local Account for MediaWiki
+accounts::accounts:
+        'wiki':
+		   ensure: present
+		   groups: apache,mysql
+
+# MySQL Config
+#MYSQL
+profile_mysql::server::mysql_repository: 'enterprise'
+profile_mysql::server::dba_managed: true
+profile_mysql::server::create_root_user: true
+profile_mysql::server::root_password: [<eyaml encrypted passwd hash string>]
+
+profile_mysql::server::databases:
+        wikidatabase:
+           ensure : present
+
+profile_mysql::server::users:
+        wiki@localhost:
+           ensure : present
+           password_hash : '*D1945B2A0E3FDF4B975C464F1C30A48C518BF90E'
+
+profile_mysql::server::grants:
+        wiki@localhost/wikidatabase.*:
+           ensure : present
+           privileges: ALL
+           user: wiki@localhost
+           table: wikidatabase.*
+
+# Apache Config
+profile_apache::server::docroot: '/var/www/mediawiki'
+profile_apache::server::directoryindex: 'index.php index.pht index.html index.html.var'
+profile_apache::server::logrotate_keep: 7
+profile_apache::server::logrotate_period: 'daily'
+profile_apache::server::logrotate_compress: true
+
+# Link for mediawiki directory
+file::add:
+  '/var/www/mediawiki-1.33.0':
+    'ensure': 'link'
+    'target': '/var/www/mediawiki'
+	'owner': 'apache'
+    'group': 'apache'
+	'selrange': 's0'
+	'selrole': 'object_r'
+	'seltype': 'httpd_sys_content_t'
+	'seluser': 'system_u'
+	'notify': 'Service[httpd]'

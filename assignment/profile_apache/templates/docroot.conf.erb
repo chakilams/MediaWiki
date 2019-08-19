@@ -1,0 +1,16 @@
+## Global docroot
+  DocumentRoot "<%= @docroot %>"
+
+## Directories, there should at least be a declaration for <%= @docroot %>
+
+  <Directory "<%= @docroot %>">
+    Options <%= @options %>
+    AllowOverride All
+<%- if @apache_version == '2.4' -%>
+    Require all granted
+<%- else -%>
+    Order allow,deny
+    allow from all
+<%- end -%>
+    DirectoryIndex <%= @directoryindex %>
+  </Directory>

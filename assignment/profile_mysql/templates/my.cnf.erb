@@ -1,0 +1,105 @@
+#########################################################
+#                 MySQL Configuration File              #
+#########################################################
+#
+[mysqld]
+
+## Performance Specific ##
+##########################
+
+innodb_buffer_pool_size 	= 12G		###	How much innodb data to store in memory. Higher = faster performance
+innodb_file_per_table		= 1		###	Each innodb table is its own file on disk. 
+innodb_flush_log_at_trx_commit 	= 2		### Flushes to disk in batches instead of per change
+innodb_io_capacity		= 800		###	Min IO speed expected to write to disk. 
+read_buffer_size 		= 2M		###	Helps with reading temp tables faster, bulk inserts and nested queries
+read_rnd_buffer_size 		= 8M		###	Helps with multi range queries and ORDER Bys. Naemon graphs point that we need this a bit higher.
+sort_buffer_size 		= 8M		### 	Helps with ORDER BY queries, which we have a lot of.
+table_open_cache 		= 4096		###	Cache data about open tables. Saves reopening tables.
+thread_cache_size 		= 256		### 	How many threads to cache. Can help reduce thread count.
+thread_stack 			= 256k		###	How much cache each thread can have. Higher = more complicated results are cached
+tmp_table_size 			= 64M		###	Max size a tmp table can be.
+innodb_log_file_size 		= 512M		##	
+innodb_log_files_in_group 	= 3		##
+innodb_read_io_threads 		= 8		##	innodb background threads for reads. Helps with reads
+join_buffer_size 		= 2M		##	Helps when a join doesn\u2019t have an index or an index wont be more helpful than a full table scan
+max_heap_table_size 		= 64M		##	Max size a tmp table can be in memory
+query_cache_limit 		= 2M		##
+query_cache_min_res_unit 	= 2048		##
+query_cache_size 		= 196M		##
+query_cache_type 		= 1		##	Caches complete query results. Data gets invalidated when underlying tables are changed.
+table_open_cache_instances 	= 8		##	Divides the table cache to reduce contention
+table-definition-cache 		= 4096		##	Stores table definitions - .frm files
+key_buffer_size 		= 16M		#	As there are no MyISAM tables, this variable helps with MyISAM temp tables.
+back_log			= 1500 		#	When MySQL gets a lot of connections in a short time, it will keep them in a back log
+innodb_purge_threads		= 2		#	May reduce locks for when updates/deletes are run often (like sessions table)
+innodb_sort_buffer_size		= 2M		#	Helps with index changes and create table statements
+#innodb_page_cleaners 		= 4		#	Will help with start up and shutdown in 5.7
+binlog_cache_size		= 128K		#	May speed up transactions
+binlog_stmt_cache_size		= 1M		#	May speed up transactions
+
+## General ##
+#############
+
+port=3306
+datadir				= /data/mysql/mysql-5.6
+socket				= /var/lib/mysql/mysql.sock
+default-storage-engine 		= InnoDB
+user 				= mysql
+symbolic-links			= 0 			# Disabling symbolic-links is recommended to prevent assorted security risks
+tmpdir				= /tmp/
+innodb_file_format 		= Barracuda 		# The newer version of Innodb.
+innodb_open_files 		= 131072		# Max number of open files innodb can have - Safety feature
+interactive_timeout 		= 28800			
+slow_query_log 			= 1
+slow_query_log_file		= /data/mysql/mysql-5.6/slow.log
+log_queries_not_using_indexes 	= 0			
+long_query_time 		= 2			
+max_allowed_packet 		= 64M			# Current setting. Need to evaluate if can go down to 16M
+max_connections 		= 780			# Maximum number of connections the server can have before not allowing anymore
+#max_user_connections		
+max-connect-errors 		= 1000000			
+min_examined_row_limit 		= 1			# Slow log setting
+open-files-limit 		= 65535			
+sql_mode 			= NO_ENGINE_SUBSTITUTION			
+sync_binlog 			= 0			# Moves to commiting in batches instead of per command
+wait_timeout 			= 28800			
+
+
+## Existing Replication Settings ##
+###################################
+
+auto_increment_increment = 2
+auto_increment_offset = 1
+binlog_format = ROW
+expire_logs_days = 3
+log_bin = /data/mysql/mysql-5
+log_bin_index = /data/mysql/mysql-5.index
+log_bin_trust_function_creators = 0
+log_bin_use_v1_row_events = 0
+log_slave_updates = 1
+master_info_repository = TABLE
+relay_log = /data/mysql/relay
+relay_log_info_file = /data/mysql/relay-log.info
+relay_log_info_repository = TABLE
+server_id = 5
+
+
+## UTF-8 compatibility ##
+#########################
+
+character-set-server			= utf8
+init_connect					= 'SET collation_connection = utf8_general_ci'
+character-set-server			= utf8
+collation-server				= utf8_general_ci
+init-connect					= 'SET NAMES utf8'
+
+[client]
+#loose-default-character-set		= utf8
+
+[mysqld_safe]
+log-error						= /data/mysql/error.log
+#pid-file						= /data/mysql/mysqld.pid
+
+[mysqldump]
+max_allowed_packet              = 512M
+#read_buffer_size                = 8M
